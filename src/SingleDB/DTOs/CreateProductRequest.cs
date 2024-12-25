@@ -2,4 +2,4 @@
 
 namespace SingleDB.DTOs;
 
-public record CreateProductRequest([Required]string Name, string? Description);
+public record CreateProductRequest([Required]string Name, string Description);

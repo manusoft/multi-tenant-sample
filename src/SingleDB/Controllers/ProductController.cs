@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SingleDB.Data;
+using SingleDB.DTOs;
 using SingleDB.Models;
 
 namespace SingleDB.Controllers;
@@ -35,15 +36,21 @@ public class ProductController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<Product>> AddProduct(Product product)
+    public ActionResult<Product> AddProduct(CreateProductRequest productRequest)
     {
+        var product = new Product
+        {
+            Name = productRequest.Name,
+            Description = productRequest.Description
+        };
+
         _context.Products.Add(product);
-        await _context.SaveChangesAsync();
+        _context.SaveChanges();
         return CreatedAtAction("GetProduct", new { id = product.Id }, product);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateProduct(int id, Product product)
+    public IActionResult UpdateProduct(int id, Product product)
     {
         if (id != product.Id)
             return BadRequest();
@@ -52,7 +59,7 @@ public class ProductController : ControllerBase
 
         try
         {
-            await _context.SaveChangesAsync();
+            _context.SaveChanges();
         }
         catch (DbUpdateConcurrencyException)
         {
@@ -74,11 +81,10 @@ public class ProductController : ControllerBase
     {
         var product = await _context.Products.FindAsync(id);
         if (product == null)
-        {
             return NotFound();
-        }
+
         _context.Products.Remove(product);
-        await _context.SaveChangesAsync();
+        _context.SaveChanges();
         return NoContent();
     }
 
